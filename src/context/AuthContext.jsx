@@ -59,12 +59,10 @@ export const AuthProvider = ({ children }) => {
         const primaryEmail = clerkUser.primaryEmailAddress?.emailAddress || '';
         const name = clerkUser.fullName || clerkUser.firstName || primaryEmail.split('@')[0] || 'Student';
         const phone = clerkUser.primaryPhoneNumber?.phoneNumber || null;
+        const rawApiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').trim().replace(/\/+$/, '');
+        const syncUrl = rawApiUrl.endsWith('/api') ? `${rawApiUrl}/auth/sync-clerk` : `${rawApiUrl}/api/auth/sync-clerk`;
 
-        const backendUrl = import.meta.env.VITE_API_URL 
-          ? import.meta.env.VITE_API_URL.replace('/api', '') 
-          : 'http://localhost:5001';
-
-        const res = await fetch(`${backendUrl}/api/auth/sync-clerk`, {
+        const res = await fetch(syncUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
