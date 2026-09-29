@@ -1,4 +1,9 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const getApiBaseUrl = () => {
+  const raw = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').trim().replace(/\/+$/, '');
+  return raw.endsWith('/api') ? raw : `${raw}/api`;
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 const getHeaders = (extraHeaders = {}) => {
   const adminToken = localStorage.getItem("vgi_admin_token");
