@@ -6,7 +6,7 @@ import { useCart } from "../context/CartContext";
 
 export const Navbar = () => {
   const { user, logout } = useAuth();
-  const { itemCount } = useCart();
+  const { itemCount, openCart } = useCart();
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -94,8 +94,9 @@ export const Navbar = () => {
             {/* Action Controls */}
             <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
               {/* Cart Icon */}
-              <Link
-                to="/cart"
+              <button
+                type="button"
+                onClick={openCart}
                 className="relative p-2 sm:p-2.5 rounded-xl text-slate-700 hover:bg-brand-50 hover:text-brand-600 transition-colors"
                 title="View Cart"
               >
@@ -105,7 +106,7 @@ export const Navbar = () => {
                     {itemCount}
                   </span>
                 )}
-              </Link>
+              </button>
 
               {/* User Profile / Auth */}
               {user ? (

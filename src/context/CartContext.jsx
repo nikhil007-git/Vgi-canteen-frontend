@@ -21,6 +21,11 @@ export const CartProvider = ({ children }) => {
   });
 
   const [couponError, setCouponError] = useState('');
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const openCart = () => setIsCartOpen(true);
+  const closeCart = () => setIsCartOpen(false);
+  const toggleCart = () => setIsCartOpen((prev) => !prev);
 
   useEffect(() => {
     try {
@@ -163,7 +168,11 @@ export const CartProvider = ({ children }) => {
         updateQuantity,
         clearCart,
         applyCoupon,
-        removeCoupon
+        removeCoupon,
+        isCartOpen,
+        openCart,
+        closeCart,
+        toggleCart
       }}
     >
       {children}

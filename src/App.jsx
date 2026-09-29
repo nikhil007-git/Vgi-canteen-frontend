@@ -8,6 +8,7 @@ import { BottomNav } from './components/BottomNav';
 import { StatusBanner } from './components/StatusBanner';
 import { LiveAlertToast } from './components/LiveAlertToast';
 import { PageSkeleton } from './components/SkeletonLoader';
+import { CartDrawer } from './components/CartDrawer';
 
 // Lazy loaded page components
 const Landing = lazy(() => import('./pages/Landing').then((m) => ({ default: m.Landing })));
@@ -70,6 +71,7 @@ const LayoutContainer = ({ children }) => {
       </main>
 
       {!isAdminRoute && !isAuthPage && <BottomNav />}
+      {!isAdminRoute && <CartDrawer />}
     </div>
   );
 };

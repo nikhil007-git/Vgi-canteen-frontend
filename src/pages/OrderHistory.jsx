@@ -9,7 +9,7 @@ export const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrderForRating, setSelectedOrderForRating] = useState(null);
-  const { addToCart } = useCart();
+  const { addToCart, openCart } = useCart();
   const navigate = useNavigate();
 
   const fetchOrders = async () => {
@@ -39,7 +39,7 @@ export const OrderHistory = () => {
         item.specialInstruction || ''
       );
     });
-    navigate('/cart');
+    openCart();
   };
 
   const activeOrders = orders.filter((o) => ['PAID', 'ACCEPTED', 'PREPARING', 'READY'].includes(o.status));

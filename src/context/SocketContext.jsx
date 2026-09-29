@@ -3,8 +3,6 @@ import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 import { playReadyChime } from '../utils/audioAlert';
 
-const SocketContext = createContext(null);
-
 const getSocketUrl = () => {
   if (import.meta.env.VITE_SOCKET_URL) {
     return import.meta.env.VITE_SOCKET_URL.trim().replace(/\/+$/, '');

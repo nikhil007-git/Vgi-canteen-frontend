@@ -42,20 +42,6 @@ export const Login = () => {
             </Link>
           </div>
 
-          {/* Helpful Guidance Notice */}
-          <div className="mb-4 p-3 bg-amber-50/90 border border-amber-200/80 rounded-2xl flex items-start gap-2.5 text-left">
-            <div className="w-5 h-5 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0 mt-0.5 text-xs">
-              💡
-            </div>
-            <div className="text-[11px] text-amber-900 leading-relaxed">
-              <span className="font-extrabold">New Student?</span> If this is your first time ordering, please switch to the{" "}
-              <Link to="/register" className="font-extrabold text-brand-600 underline hover:text-brand-700">
-                Sign Up
-              </Link>{" "}
-              tab above to create your account first.
-            </div>
-          </div>
-
           {/* Clerk SignIn */}
           <SignIn
             routing="path"

@@ -4,7 +4,7 @@ import { Home, Utensils, ShoppingBag, Clock, User } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 export const BottomNav = () => {
-  const { itemCount } = useCart();
+  const { itemCount, openCart, isCartOpen } = useCart();
 
   const navItemClass = ({ isActive }) =>
     `flex flex-col items-center justify-center py-2 px-3 text-xs font-semibold transition-colors relative ${
@@ -23,7 +23,13 @@ export const BottomNav = () => {
         <span>Menu</span>
       </NavLink>
 
-      <NavLink to="/cart" className={navItemClass}>
+      <button
+        type="button"
+        onClick={openCart}
+        className={`flex flex-col items-center justify-center py-2 px-3 text-xs font-semibold transition-colors relative ${
+          isCartOpen ? 'text-brand-600 font-bold' : 'text-slate-500 hover:text-slate-900'
+        }`}
+      >
         <div className="relative">
           <ShoppingBag className="w-5 h-5 mb-1" />
           {itemCount > 0 && (
@@ -33,7 +39,7 @@ export const BottomNav = () => {
           )}
         </div>
         <span>Cart</span>
-      </NavLink>
+      </button>
 
       <NavLink to="/orders" className={navItemClass}>
         <Clock className="w-5 h-5 mb-1" />

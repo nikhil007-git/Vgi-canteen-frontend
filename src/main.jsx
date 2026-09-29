@@ -15,20 +15,11 @@ window.addEventListener('vite:preloadError', (event) => {
   }
 });
 
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_bW9kZXJuLXBob2VuaXgtMjgyNi5jbGVyay5hY2NvdW50cy5kZXYk";
-
-const clerkLocalization = {
-  unstable__errors: {
-    external_account_not_found: "No account found with this Google email. If you are a new student, please click 'Sign Up' first to create your account!"
-  }
-};
-
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ErrorBoundary>
       <ClerkProvider
         publishableKey={PUBLISHABLE_KEY}
-        localization={clerkLocalization}
         afterSignOutUrl="/home"
         appearance={{
           layout: {

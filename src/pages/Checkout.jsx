@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { vgiApi } from '../services/api';
 
 export const Checkout = () => {
-  const { cart, subtotal, discount, finalTotal, coupon, clearCart } = useCart();
+  const { cart, subtotal, discount, finalTotal, coupon, clearCart, openCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -15,8 +15,14 @@ export const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (cart.length === 0) {
+      openCart();
+      navigate('/menu', { replace: true });
+    }
+  }, [cart.length, navigate, openCart]);
+
   if (cart.length === 0) {
-    navigate('/cart');
     return null;
   }
 
