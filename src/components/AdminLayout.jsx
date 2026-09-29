@@ -64,18 +64,18 @@ export const AdminLayout = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
       {/* Mobile Top Bar */}
-      <div className="md:hidden bg-slate-900 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-40">
+      <div className="md:hidden bg-white text-slate-800 border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40 shadow-xs">
         <div className="flex items-center gap-2">
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-1 text-slate-300 hover:text-white">
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-1 text-slate-600 hover:text-slate-900">
             {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
-          <span className="font-extrabold text-sm tracking-tight">VGI Canteen Staff</span>
+          <span className="font-extrabold text-sm tracking-tight text-slate-900">VGI Canteen Staff</span>
         </div>
         <button
           onClick={() => setShowScanner(true)}
-          className="px-3 py-1.5 rounded-lg bg-brand-500 text-white text-xs font-bold flex items-center gap-1.5"
+          className="px-3 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs"
         >
           <QrCode className="w-4 h-4" />
           <span>Verify Pickup</span>
@@ -84,23 +84,23 @@ export const AdminLayout = () => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 flex flex-col justify-between transition-transform duration-300 md:translate-x-0 md:static ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white text-slate-700 border-r border-slate-200/80 shadow-xs flex flex-col justify-between transition-transform duration-300 md:translate-x-0 md:static ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div>
           {/* Brand header */}
-          <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+          <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-white">
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-black text-white text-base tracking-tight">VGI Operations</span>
-                <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-brand-500/20 text-brand-400 border border-brand-500/30">
+                <span className="font-black text-slate-900 text-base tracking-tight">VGI Operations</span>
+                <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-brand-50 text-brand-700 border border-brand-200/70">
                   Staff
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 mt-0.5">Counter Control Panel</p>
+              <p className="text-[11px] text-slate-500 font-medium mt-0.5">Counter Control Panel</p>
             </div>
-            <button onClick={() => setSidebarOpen(false)} className="md:hidden text-slate-400">
+            <button onClick={() => setSidebarOpen(false)} className="md:hidden text-slate-400 hover:text-slate-700">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -112,7 +112,7 @@ export const AdminLayout = () => {
                 setSidebarOpen(false);
                 setShowScanner(true);
               }}
-              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-brand-500/20 transition-all hover:scale-[1.02]"
+              className="w-full py-2.5 px-4 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm shadow-brand-500/20 transition-all hover:scale-[1.01]"
             >
               <QrCode className="w-4 h-4" />
               <span>Verify Counter Pickup</span>
@@ -130,10 +130,10 @@ export const AdminLayout = () => {
                   end={item.end}
                   onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                    `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
                       isActive
-                        ? 'bg-slate-800 text-brand-400'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                        ? 'bg-brand-50 text-brand-700 font-bold border border-brand-200/80 shadow-2xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                     }`
                   }
                 >
@@ -146,14 +146,14 @@ export const AdminLayout = () => {
         </div>
 
         {/* Bottom user badge & exit */}
-        <div className="p-4 border-t border-slate-800">
+        <div className="p-4 border-t border-slate-100 bg-slate-50/60">
           <div className="mb-3 px-2">
-            <p className="text-xs font-semibold text-white truncate">{user?.name}</p>
-            <p className="text-[10px] text-slate-400 truncate">{user?.email}</p>
+            <p className="text-xs font-semibold text-slate-800 truncate">{user?.name}</p>
+            <p className="text-[10px] text-slate-500 truncate">{user?.email}</p>
           </div>
           <Link
             to="/home"
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 hover:text-white transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white border border-slate-200/80 hover:bg-slate-100 text-xs font-bold text-slate-700 hover:text-slate-900 transition-colors shadow-2xs"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Exit to Student App</span>
@@ -162,7 +162,7 @@ export const AdminLayout = () => {
       </aside>
 
       {/* Main Admin Content Container */}
-      <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full overflow-y-auto">
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full overflow-y-auto bg-slate-50">
         <Outlet />
       </main>
 
