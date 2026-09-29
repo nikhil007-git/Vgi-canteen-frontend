@@ -16,7 +16,7 @@ const getSocketUrl = () => {
 
 const SOCKET_URL = getSocketUrl();
 
-export const SocketContext = createContext(null);
+const SocketContext = createContext(null);
 
 export const SocketProvider = ({ children }) => {
   const { user, isAdmin } = useAuth();
@@ -118,6 +118,7 @@ export const SocketProvider = ({ children }) => {
 
 export const useSocket = () => {
   const context = useContext(SocketContext);
-  return context || { socket: null, liveAlert: null, clearLiveAlert: () => {} };
+  if (!context) throw new Error('useSocket must be used within SocketProvider');
+  return context;
 };
 
