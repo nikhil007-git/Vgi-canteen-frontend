@@ -232,9 +232,9 @@ export const AdminSettings = () => {
             <button
               type="submit"
               disabled={credSaving}
-              className="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-md shadow-brand-500/20 transition-all flex items-center gap-2 disabled:opacity-50"
+              className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 disabled:opacity-50"
             >
-              <ShieldCheck className="w-4 h-4 text-white" />
+              <ShieldCheck className="w-4 h-4 text-amber-400" />
               <span>{credSaving ? 'Updating Credentials...' : 'Save New Admin Credentials'}</span>
             </button>
           </div>

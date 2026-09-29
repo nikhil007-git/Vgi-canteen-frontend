@@ -123,7 +123,7 @@ export const AdminOrders = () => {
               onClick={() => setStatusFilter(st)}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex-shrink-0 ${
                 statusFilter === st
-                  ? 'bg-brand-500 text-white shadow-xs'
+                  ? 'bg-slate-900 text-white shadow-xs'
                   : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
               }`}
             >
