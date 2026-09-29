@@ -16,6 +16,8 @@ const getSocketUrl = () => {
 
 const SOCKET_URL = getSocketUrl();
 
+const SocketContext = createContext(null);
+
 export const SocketProvider = ({ children }) => {
   const { user, isAdmin } = useAuth();
   const [socket, setSocket] = useState(null);
