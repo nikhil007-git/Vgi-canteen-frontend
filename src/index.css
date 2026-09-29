@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+}
+
+/* Custom modern scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Skeleton Loading Shimmer Effect */
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background-color: #e2e8f0;
+}
+.skeleton-shimmer::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.4) 20%,
+    rgba(255, 255, 255, 0.7) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 1.6s infinite;
+  content: '';
+}
+
+/* Hide spin buttons on number inputs */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+
+/* Clerk Clean Overrides */
+.cl-rootBox {
+  width: 100% !important;
+}
+.cl-cardBox, .cl-card {
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+.cl-header, .cl-headerTitle, .cl-headerSubtitle {
+  display: none !important;
+}
+.cl-footer, .cl-footerAction {
+  display: none !important;
+}
+.cl-socialButtonsRoot, .cl-socialButtons, .cl-socialButtonsBlockButton {
+  width: 100% !important;
+}
+.cl-lastAuthenticationStrategyBadge {
+  display: none !important;
+}
+
+/* Cloudflare Turnstile & Clerk Captcha Suppression */
+.cl-captcha,
+.cl-captchaElement,
+.cl-captcha-container,
+[class*="captcha"],
+.cf-turnstile,
+div[id*="cf-turnstile"],
+iframe[src*="cloudflare"],
+iframe[src*="challenges.cloudflare.com"],
+iframe[src*="turnstile"],
+div:has(> iframe[src*="challenges.cloudflare.com"]),
+div:has(> iframe[src*="cloudflare"]) {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
