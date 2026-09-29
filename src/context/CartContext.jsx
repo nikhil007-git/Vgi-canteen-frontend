@@ -7,7 +7,14 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(() => {
     try {
       const saved = localStorage.getItem('vgi_cart');
-      return saved ? JSON.parse(saved) : [];
+      const parsed = saved ? JSON.parse(saved) : [];
+      return parsed.map((item) => ({
+        ...item,
+        name: item.name || item.itemName || 'Item',
+        itemName: item.itemName || item.name || 'Item',
+        price: item.price || item.basePrice || 0,
+        basePrice: item.basePrice || item.price || 0
+      }));
     } catch {
       return [];
     }
@@ -50,7 +57,7 @@ export const CartProvider = ({ children }) => {
   // Calculate Subtotal
   const subtotal = cart.reduce((total, item) => {
     const optionsDelta = (item.selectedOptions || []).reduce((acc, opt) => acc + (opt.priceDelta || 0), 0);
-    const itemUnitTotal = (item.basePrice || 0) + optionsDelta;
+    const itemUnitTotal = (item.basePrice || item.price || 0) + optionsDelta;
     return total + itemUnitTotal * (item.quantity || 1);
   }, 0);
 
@@ -73,9 +80,9 @@ export const CartProvider = ({ children }) => {
       // Check if identical item with identical options already in cart
       const optionsKey = selectedOptions.map(o => o.id).sort().join('-');
       const existingIndex = prevCart.findIndex(
-        (ci) => ci.menuItemId === menuItem.id &&
+        (ci) => (ci.menuItemId === menuItem.id || ci.id === menuItem.id) &&
                 ci.optionsKey === optionsKey &&
-                ci.specialInstruction === specialInstruction
+                (ci.specialInstruction === specialInstruction || ci.instructions === specialInstruction)
       );
 
       if (existingIndex > -1) {
@@ -87,14 +94,18 @@ export const CartProvider = ({ children }) => {
       return [
         ...prevCart,
         {
+          id: menuItem.id,
           menuItemId: menuItem.id,
-          itemName: menuItem.name,
+          name: menuItem.name || menuItem.itemName || 'Item',
+          itemName: menuItem.name || menuItem.itemName || 'Item',
+          price: menuItem.price,
           basePrice: menuItem.price,
           imageUrl: menuItem.imageUrl,
           quantity,
           selectedOptions,
           optionsKey,
-          specialInstruction
+          specialInstruction,
+          instructions: specialInstruction
         }
       ];
     });
@@ -104,14 +115,21 @@ export const CartProvider = ({ children }) => {
     setCart((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const updateQuantity = (index, delta) => {
+  const updateQuantity = (index, deltaOrQty) => {
     setCart((prev) => {
+      if (!prev[index]) return prev;
       const updated = [...prev];
-      const newQty = updated[index].quantity + delta;
+      let newQty;
+      // If passing direct new quantity (e.g. from stepper)
+      if (deltaOrQty === 1 || deltaOrQty === -1) {
+        newQty = updated[index].quantity + deltaOrQty;
+      } else {
+        newQty = deltaOrQty;
+      }
       if (newQty <= 0) {
         return prev.filter((_, i) => i !== index);
       }
-      updated[index].quantity = newQty;
+      updated[index] = { ...updated[index], quantity: newQty };
       return updated;
     });
   };

@@ -206,7 +206,7 @@ export const Checkout = () => {
               <div key={idx} className="flex items-center justify-between text-xs">
                 <div>
                   <span className="font-bold text-slate-800">
-                    {item.quantity}x {item.itemName}
+                    {item.quantity}x {item.itemName || item.name || 'Food Item'}
                   </span>
                   {item.selectedOptions?.length > 0 && (
                     <span className="block text-[11px] text-slate-400">
