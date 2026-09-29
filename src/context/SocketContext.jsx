@@ -5,18 +5,7 @@ import { playReadyChime } from '../utils/audioAlert';
 
 const SocketContext = createContext(null);
 
-const getSocketUrl = () => {
-  if (import.meta.env.VITE_SOCKET_URL) {
-    return import.meta.env.VITE_SOCKET_URL.trim().replace(/\/+$/, '');
-  }
-  if (import.meta.env.VITE_API_URL) {
-    const raw = import.meta.env.VITE_API_URL.trim().replace(/\/+$/, '');
-    return raw.replace(/\/api$/, '');
-  }
-  return 'http://localhost:5000';
-};
-
-const SOCKET_URL = getSocketUrl();
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
 
 export const SocketProvider = ({ children }) => {
   const { user, isAdmin } = useAuth();
