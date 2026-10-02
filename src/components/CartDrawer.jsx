@@ -155,12 +155,9 @@ export const CartDrawer = () => {
                   const unitPrice = (item.basePrice || item.price || 0) + optionsDelta;
                   const itemTotal = unitPrice * item.quantity;
 
-                  const displayName = item.itemName || item.name || item.title || "Delicious Food";
-                  const instructions = item.instructions || item.specialInstruction;
-
                   return (
                     <div 
-                      key={`${item.id || item.menuItemId || index}-${index}`}
+                      key={`${item.id}-${index}`}
                       className="pt-3 first:pt-0 flex gap-3.5 items-start group"
                     >
                       {/* Image Thumbnail */}
@@ -168,7 +165,7 @@ export const CartDrawer = () => {
                         {item.imageUrl ? (
                           <img 
                             src={item.imageUrl} 
-                            alt={displayName} 
+                            alt={item.name} 
                             className="w-full h-full object-cover"
                             onError={(e) => {
                               e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100";
@@ -184,8 +181,8 @@ export const CartDrawer = () => {
                       {/* Item Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-1">
-                          <h4 className="font-bold text-slate-900 text-xs sm:text-sm leading-snug line-clamp-2">
-                            {displayName}
+                          <h4 className="font-bold text-slate-900 text-xs sm:text-sm leading-snug truncate">
+                            {item.name}
                           </h4>
                           <button
                             onClick={() => removeFromCart(index)}
@@ -204,9 +201,9 @@ export const CartDrawer = () => {
                         )}
 
                         {/* Special Note */}
-                        {instructions && (
+                        {item.instructions && (
                           <p className="text-[10px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100 inline-block mt-1">
-                            Note: {instructions}
+                            Note: {item.instructions}
                           </p>
                         )}
 
