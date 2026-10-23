@@ -9,6 +9,7 @@ import { StatusBanner } from './components/StatusBanner';
 import { LiveAlertToast } from './components/LiveAlertToast';
 import { PageSkeleton } from './components/SkeletonLoader';
 import { CartDrawer } from './components/CartDrawer';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 
 // Lazy loaded page components
 const Landing = lazy(() => import('./pages/Landing').then((m) => ({ default: m.Landing })));
@@ -72,6 +73,7 @@ const LayoutContainer = ({ children }) => {
 
       {!isAdminRoute && !isAuthPage && <BottomNav />}
       {!isAdminRoute && <CartDrawer />}
+      {!isAdminRoute && <PWAInstallPrompt />}
     </div>
   );
 };

@@ -15,6 +15,15 @@ window.addEventListener('vite:preloadError', (event) => {
   }
 });
 
+// Register Progressive Web App (PWA) Service Worker
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch((err) => {
+      console.warn('SW registration failed:', err);
+    });
+  });
+}
+
 const PUBLISHABLE_KEY =
   import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ||
   "pk_test_bW9kZXJuLXBob2VuaXgtMjgyNi5jbGVyay5hY2NvdW50cy5kZXYk";

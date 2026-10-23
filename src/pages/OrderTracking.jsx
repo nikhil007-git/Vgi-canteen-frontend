@@ -1,27 +1,61 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Clock, Phone, MessageCircle, ArrowLeft, CheckCircle2, Star, AlertCircle, RefreshCw } from 'lucide-react';
+import { Clock, Phone, MessageCircle, ArrowLeft, CheckCircle2, Star, AlertCircle, RefreshCw, Bell, Users } from 'lucide-react';
 import { vgiApi } from '../services/api';
 import { OrderTimeline } from '../components/OrderTimeline';
 import { QRDisplay } from '../components/QRDisplay';
 import { RatingModal } from '../components/RatingModal';
 import { OrderTrackingSkeleton } from '../components/SkeletonLoader';
 import { useSocket } from '../context/SocketContext';
+import { playReadyChime } from '../utils/audioAlert';
 
 export const OrderTracking = () => {
   const { id } = useParams();
   const { socket } = useSocket();
   const [order, setOrder] = useState(null);
+  const [queuePosition, setQueuePosition] = useState(null);
   const [canteenContact, setCanteenContact] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showRatingModal, setShowRatingModal] = useState(false);
+  const [notifyPerm, setNotifyPerm] = useState(() => ('Notification' in window ? Notification.permission : 'denied'));
+  const lastStatusRef = useRef(null);
+
+  const triggerReadyNotification = (currentOrder) => {
+    playReadyChime();
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification('Your Order is Ready for Pickup! 🔔', {
+          body: `Order #${currentOrder.displayNumber || currentOrder.orderNumber} is hot & ready at the counter. Pickup Token: ${currentOrder.pickupCode}`,
+          icon: '/vite.svg'
+        });
+      } catch (e) {
+        console.warn('Native notification failed:', e);
+      }
+    }
+  };
+
+  const handleEnableNotifications = async () => {
+    if ('Notification' in window) {
+      try {
+        const perm = await Notification.requestPermission();
+        setNotifyPerm(perm);
+      } catch (err) {
+        console.warn('Notification permission error', err);
+      }
+    }
+  };
 
   const fetchOrder = async () => {
     try {
       const res = await vgiApi.getOrderById(id);
       if (res.success) {
+        if (lastStatusRef.current && lastStatusRef.current !== 'READY' && res.order.status === 'READY') {
+          triggerReadyNotification(res.order);
+        }
+        lastStatusRef.current = res.order.status;
         setOrder(res.order);
+        if (res.queuePosition !== undefined) setQueuePosition(res.queuePosition);
         if (res.canteenContact) setCanteenContact(res.canteenContact);
       }
     } catch (err) {
@@ -39,6 +73,9 @@ export const OrderTracking = () => {
 
       const handleOrderUpdate = (data) => {
         if (data.orderId === id) {
+          if (data.status === 'READY' && lastStatusRef.current !== 'READY') {
+            triggerReadyNotification({ displayNumber: data.orderId, pickupCode: data.pickupCode });
+          }
           fetchOrder();
         }
       };
@@ -134,6 +171,56 @@ export const OrderTracking = () => {
           </div>
         </div>
       </div>
+
+      {/* Live Queue Estimation Card (When in kitchen preparation) */}
+      {queuePosition !== null && ['PAID', 'ACCEPTED', 'PREPARING'].includes(order.status) && (
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 rounded-3xl p-5 shadow-xs flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-black text-base shadow-sm shrink-0">
+              <Users className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-700">Kitchen Queue Status</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              </div>
+              <h3 className="text-sm sm:text-base font-extrabold text-slate-900 mt-0.5">
+                {queuePosition === 0 ? 'Your meal is next in line to prepare!' : `${queuePosition} order${queuePosition > 1 ? 's' : ''} ahead of yours`}
+              </h3>
+              <p className="text-xs text-slate-600 mt-0.5">
+                Estimated wait: ~{order.prepTimeMinutes || (queuePosition + 1) * 5} mins
+              </p>
+            </div>
+          </div>
+          <div className="hidden sm:block text-right">
+            <span className="text-2xl font-black text-amber-600">
+              {queuePosition === 0 ? '#1' : `#${queuePosition + 1}`}
+            </span>
+            <span className="block text-[10px] font-bold text-slate-400 uppercase">Queue Slot</span>
+          </div>
+        </div>
+      )}
+
+      {/* Browser Notification Opt-In Banner */}
+      {notifyPerm !== 'granted' && 'Notification' in window && !['COMPLETED', 'CANCELLED'].includes(order.status) && (
+        <div className="bg-slate-900 text-white rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-400/20 text-amber-400 flex items-center justify-center shrink-0">
+              <Bell className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="font-extrabold text-xs sm:text-sm">Never miss your pickup!</h4>
+              <p className="text-[11px] text-slate-300">Get an instant audio & push alert as soon as your meal is hot & ready.</p>
+            </div>
+          </div>
+          <button
+            onClick={handleEnableNotifications}
+            className="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shrink-0 transition-colors shadow-sm"
+          >
+            Enable Ready Alerts
+          </button>
+        </div>
+      )}
 
       {/* Main Grid: Left Timeline + Right Pickup QR Pass */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">

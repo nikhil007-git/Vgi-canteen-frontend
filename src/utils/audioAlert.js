@@ -36,3 +36,44 @@ export const playReadyChime = () => {
   }
 };
 
+// Kitchen New Order Sound Alert (Ding-Dong Service Bell)
+export const playNewOrderKitchenAlert = () => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+
+    const ctx = new AudioContext();
+    const startTime = ctx.currentTime;
+
+    // Dual-tone service bell (880Hz A5 followed by 1174.6Hz D6)
+    const tones = [
+      { freq: 880, delay: 0, dur: 0.4 },
+      { freq: 1174.66, delay: 0.25, dur: 0.6 }
+    ];
+
+    tones.forEach((tone) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(tone.freq, startTime + tone.delay);
+
+      gain.gain.setValueAtTime(0.35, startTime + tone.delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + tone.delay + tone.dur);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(startTime + tone.delay);
+      osc.stop(startTime + tone.delay + tone.dur + 0.1);
+    });
+
+    if ('vibrate' in navigator) {
+      navigator.vibrate([300, 150, 300]);
+    }
+  } catch (err) {
+    console.warn('Could not play kitchen alert:', err);
+  }
+};
+
+

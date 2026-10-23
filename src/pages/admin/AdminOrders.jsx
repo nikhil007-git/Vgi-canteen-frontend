@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Clock,
   CheckCircle2,
@@ -10,11 +10,15 @@ import {
   Search,
   RefreshCw,
   Phone,
-  AlertTriangle
+  AlertTriangle,
+  Printer,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { vgiApi } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
 import { QRScannerModal } from '../../components/QRScannerModal';
+import { playNewOrderKitchenAlert } from '../../utils/audioAlert';
 
 export const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -26,7 +30,80 @@ export const AdminOrders = () => {
   const [cancelModalOrder, setCancelModalOrder] = useState(null);
   const [cancelReason, setCancelReason] = useState('');
   const [showScanner, setShowScanner] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('vgi_admin_sound') !== 'false');
+  const soundEnabledRef = useRef(soundEnabled);
   const { socket } = useSocket();
+
+  useEffect(() => {
+    soundEnabledRef.current = soundEnabled;
+    localStorage.setItem('vgi_admin_sound', soundEnabled ? 'true' : 'false');
+  }, [soundEnabled]);
+
+  const toggleSound = () => {
+    setSoundEnabled((prev) => !prev);
+  };
+
+  const handlePrintKOT = (order) => {
+    const printWindow = window.open('', '_blank', 'width=420,height=600');
+    if (!printWindow) {
+      alert('Please allow popups to print Kitchen Order Tickets (KOT).');
+      return;
+    }
+    const itemsHtml = (order.items || []).map((item) => `
+      <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px;">
+        <span style="font-weight: bold;">${item.quantity}x ${item.itemName}</span>
+        <span>₹${item.subtotal || (item.unitPrice * item.quantity)}</span>
+      </div>
+      ${item.options?.length ? `<div style="font-size: 11px; color: #555; margin-left: 14px; margin-bottom: 3px;">Options: ${item.options.map(o => o.optionName).join(', ')}</div>` : ''}
+      ${item.specialInstruction ? `<div style="font-size: 11px; color: #d97706; font-style: italic; margin-left: 14px; margin-bottom: 3px;">Note: "${item.specialInstruction}"</div>` : ''}
+    `).join('');
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>KOT - #${order.displayNumber || order.orderNumber}</title>
+          <style>
+            @page { size: 80mm auto; margin: 4mm; }
+            body { font-family: 'Courier New', Courier, monospace; width: 72mm; margin: 0 auto; color: #000; font-size: 12px; }
+            .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 8px; margin-bottom: 8px; }
+            .token { font-size: 26px; font-weight: 900; margin: 4px 0; }
+            .meta { font-size: 11px; margin-bottom: 8px; border-bottom: 1px dashed #000; padding-bottom: 8px; }
+            .items { margin: 8px 0; border-bottom: 2px dashed #000; padding-bottom: 8px; }
+            .footer { text-align: center; font-size: 11px; margin-top: 10px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h2 style="margin:0; font-size: 16px;">VGI CAMPUS CANTEEN</h2>
+            <div style="font-size: 12px; font-weight: bold; margin-top: 2px;">KITCHEN ORDER TICKET (KOT)</div>
+            <div class="token">TOKEN: ${order.pickupCode || order.displayNumber}</div>
+          </div>
+          <div class="meta">
+            <div><strong>Order:</strong> #${order.displayNumber || order.orderNumber}</div>
+            <div><strong>Time:</strong> ${new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+            <div><strong>Customer:</strong> ${order.user?.name || 'Walk-in'} (${order.phone})</div>
+            <div><strong>Status:</strong> ${order.status}</div>
+          </div>
+          <div class="items">
+            <div style="font-weight: bold; margin-bottom: 6px; text-decoration: underline;">ITEMS TO PREPARE:</div>
+            ${itemsHtml}
+          </div>
+          <div class="footer">
+            <div style="font-weight: bold;">TOTAL: ₹${order.total}</div>
+            <div style="margin-top: 4px;">--- KITCHEN MASTER COPY ---</div>
+          </div>
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() { window.close(); }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
 
   const fetchOrders = async () => {
     try {
@@ -46,11 +123,18 @@ export const AdminOrders = () => {
     fetchOrders();
 
     if (socket) {
-      socket.on('new_order', () => fetchOrders());
+      const handleNewOrder = () => {
+        if (soundEnabledRef.current) {
+          playNewOrderKitchenAlert();
+        }
+        fetchOrders();
+      };
+
+      socket.on('new_order', handleNewOrder);
       socket.on('admin_order_updated', () => fetchOrders());
 
       return () => {
-        socket.off('new_order');
+        socket.off('new_order', handleNewOrder);
         socket.off('admin_order_updated');
       };
     }
@@ -95,6 +179,20 @@ export const AdminOrders = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Audio Chime Mute/Unmute Toggle */}
+          <button
+            onClick={toggleSound}
+            className={`p-2.5 rounded-xl border flex items-center gap-1.5 text-xs font-bold transition-all shadow-2xs ${
+              soundEnabled
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
+                : 'bg-slate-100 border-slate-200 text-slate-500 hover:bg-slate-200'
+            }`}
+            title={soundEnabled ? 'Kitchen Bell Sound Alert Enabled (Click to Mute)' : 'Kitchen Bell Sound Alert Muted (Click to Enable)'}
+          >
+            {soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-600" /> : <VolumeX className="w-4 h-4 text-slate-400" />}
+            <span className="hidden sm:inline">{soundEnabled ? 'Sound ON' : 'Muted'}</span>
+          </button>
+
           <button
             onClick={() => setShowScanner(true)}
             className="px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-md shadow-brand-500/20 flex items-center gap-1.5 transition-all"
@@ -254,6 +352,16 @@ export const AdminOrders = () => {
 
                   {/* Operational Action Buttons */}
                   <div className="md:col-span-4 flex flex-wrap sm:flex-nowrap items-center justify-end gap-2 pt-2 md:pt-0">
+                    {/* Print KOT Receipt */}
+                    <button
+                      onClick={() => handlePrintKOT(order)}
+                      className="px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-colors"
+                      title="Print Kitchen Order Ticket (KOT)"
+                    >
+                      <Printer className="w-4 h-4 text-slate-600" />
+                      <span className="hidden sm:inline">KOT</span>
+                    </button>
+
                     {/* State: PAID -> Start Preparing with ETA */}
                     {isNew && (
                       <button
