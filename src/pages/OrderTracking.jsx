@@ -72,9 +72,12 @@ export const OrderTracking = () => {
       socket.emit('join_order', id);
 
       const handleOrderUpdate = (data) => {
-        if (data.orderId === id) {
+        if (data.orderId === id || !data.orderId) {
           if (data.status === 'READY' && lastStatusRef.current !== 'READY') {
             triggerReadyNotification({ displayNumber: data.orderId, pickupCode: data.pickupCode });
+          } else if (data.status === 'COMPLETED' && lastStatusRef.current !== 'COMPLETED') {
+            playReadyChime();
+            if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
           }
           fetchOrder();
         }
@@ -198,6 +201,34 @@ export const OrderTracking = () => {
             </span>
             <span className="block text-[10px] font-bold text-slate-400 uppercase">Queue Slot</span>
           </div>
+        </div>
+      )}
+
+      {/* Order Completed Celebration Banner */}
+      {order.status === 'COMPLETED' && (
+        <div className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-3xl p-5 shadow-lg shadow-emerald-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in fade-in">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 text-white flex items-center justify-center font-black text-xl shadow-xs shrink-0">
+              🎉
+            </div>
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-100 block">
+                Order Picked Up & Completed
+              </span>
+              <h3 className="text-base sm:text-lg font-black tracking-tight">
+                Enjoy your meal!
+              </h3>
+              <p className="text-xs text-white/90 mt-0.5">
+                Your order has been collected at the canteen counter.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowRatingModal(true)}
+            className="px-4 py-2.5 rounded-xl bg-white text-emerald-800 font-extrabold text-xs shadow-md hover:bg-emerald-50 transition-all shrink-0"
+          >
+            {order.rating ? 'Edit Rating ★' : 'Rate Your Food ★'}
+          </button>
         </div>
       )}
 

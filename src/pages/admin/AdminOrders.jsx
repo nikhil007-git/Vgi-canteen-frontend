@@ -13,7 +13,8 @@ import {
   AlertTriangle,
   Printer,
   Volume2,
-  VolumeX
+  VolumeX,
+  MessageCircle
 } from 'lucide-react';
 import { vgiApi } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
@@ -393,15 +394,30 @@ export const AdminOrders = () => {
                       </div>
                     )}
 
-                    {/* State: READY -> Confirm Pickup */}
+                    {/* State: READY -> WhatsApp Notify & Confirm Pickup */}
                     {isReady && (
-                      <button
-                        onClick={() => handleVerifyDirect(order.pickupCode)}
-                        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-1.5 transition-all"
-                      >
-                        <CheckCheck className="w-4 h-4" />
-                        <span>Confirm Pickup</span>
-                      </button>
+                      <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <a
+                          href={`https://wa.me/${(order.phone || '').replace(/\D/g, '')}?text=${encodeURIComponent(
+                            `🎉 VGI Canteen: Hi ${order.user?.name || 'Student'}! Your Order #${order.displayNumber || order.orderNumber} is HOT & READY for pickup at the counter! Token: ${order.pickupCode}.`
+                          )}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold text-xs flex items-center gap-1.5 transition-colors"
+                          title="Send Instant WhatsApp Pickup Alert to Customer Phone"
+                        >
+                          <MessageCircle className="w-4 h-4 text-emerald-600" />
+                          <span className="hidden sm:inline">WhatsApp Alert</span>
+                        </a>
+
+                        <button
+                          onClick={() => handleVerifyDirect(order.pickupCode)}
+                          className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-1.5 transition-all"
+                        >
+                          <CheckCheck className="w-4 h-4" />
+                          <span>Confirm Pickup</span>
+                        </button>
+                      </div>
                     )}
 
                     {/* Cancel button (allowed if not completed) */}
