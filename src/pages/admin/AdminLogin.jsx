@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { ShieldCheck, Lock, User, ArrowRight, ArrowLeft, AlertCircle, Eye, EyeOff, KeyRound, Sparkles, Loader2 } from "lucide-react";
+import { ShieldCheck, Lock, User, ArrowRight, ArrowLeft, AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 export const AdminLogin = () => {
@@ -43,12 +43,6 @@ export const AdminLogin = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const fillDefaults = () => {
-    setIdentifier("admin");
-    setPassword("admin123");
-    setError("");
   };
 
   return (
@@ -147,27 +141,6 @@ export const AdminLogin = () => {
             )}
           </button>
         </form>
-
-        {/* 1-Click Autofill Card */}
-        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 text-center space-y-2">
-          <div className="flex items-center justify-center gap-1.5 text-xs text-amber-700 font-bold">
-            <KeyRound className="w-3.5 h-3.5" />
-            <span>Default Access Credentials</span>
-          </div>
-          <div className="text-[11px] text-slate-600 font-mono">
-            Username: <span className="font-bold text-slate-900 bg-white border border-slate-200 px-2 py-0.5 rounded shadow-2xs">admin</span>
-            {"  |  "}
-            Password: <span className="font-bold text-slate-900 bg-white border border-slate-200 px-2 py-0.5 rounded shadow-2xs">admin123</span>
-          </div>
-          <button
-            type="button"
-            onClick={fillDefaults}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-700 transition-colors pt-1 cursor-pointer"
-          >
-            <Sparkles className="w-3 h-3" />
-            <span>Click to autofill credentials</span>
-          </button>
-        </div>
 
         {/* Back Link */}
         <div className="text-center pt-1">
